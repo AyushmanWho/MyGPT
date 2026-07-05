@@ -1,8 +1,9 @@
 import { useChat } from "../../context/ChatContext";
 import Message from "./Message";
+import TypingIndicator from "../ui/TypingIndicator";
 
 export default function ChatArea() {
-  const { messages } = useChat();
+  const { messages, isThinking } = useChat();
 
   if (messages.length === 0) {
     return (
@@ -34,6 +35,7 @@ export default function ChatArea() {
             content={msg.content}
           />
         ))}
+        {isThinking && <TypingIndicator />}
       </div>
     </main>
   );

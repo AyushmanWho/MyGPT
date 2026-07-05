@@ -5,11 +5,11 @@ const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
   const [messages, setMessages] = useState([]);
+  const [isThinking, setIsThinking] = useState(false);
 
   async function sendMessage(text) {
     if (!text.trim()) return;
 
-    // Add the user's message immediately
     const userMessage = {
       id: Date.now(),
       role: "user",
@@ -18,11 +18,11 @@ export function ChatProvider({ children }) {
 
     setMessages((prev) => [...prev, userMessage]);
 
+    setIsThinking(true);
+
     try {
-      // Send the message to the FastAPI backend
       const reply = await sendToAI(text);
 
-      // Add the AI's response
       const aiMessage = {
         id: Date.now() + 1,
         role: "assistant",
@@ -41,6 +41,8 @@ export function ChatProvider({ children }) {
           content: "⚠️ Failed to connect to the AI backend.",
         },
       ]);
+    } finally {
+      setIsThinking(false);
     }
   }
 
@@ -49,6 +51,7 @@ export function ChatProvider({ children }) {
       value={{
         messages,
         sendMessage,
+        isThinking,
       }}
     >
       {children}
