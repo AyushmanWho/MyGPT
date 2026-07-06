@@ -1,26 +1,47 @@
 import Markdown from "../ui/Markdown";
+import Avatar from "../ui/Avatar";
 
 export default function Message({ role, content }) {
   const isUser = role === "user";
 
   return (
     <div
-      className={`flex w-full mb-6 ${
-        isUser ? "justify-end" : "justify-start"
+      className={`flex items-start gap-4 mb-8 ${
+        isUser ? "flex-row-reverse" : ""
       }`}
     >
+      {/* Avatar */}
+      <Avatar role={role} />
+
+      {/* Message Section */}
       <div
-        className={`max-w-3xl rounded-2xl px-5 py-4 leading-8 ${
-          isUser
-            ? "bg-violet-600 text-white"
-            : "bg-[#1A1F29] text-gray-100"
-        }`}
+        className={`flex flex-col ${
+          isUser ? "items-end" : "items-start"
+        } flex-1`}
       >
-        {isUser ? (
-          content
-        ) : (
-          <Markdown content={content} />
-        )}
+        {/* Name */}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-sm font-semibold text-gray-300">
+            {isUser ? "You" : "MyGPT"}
+          </span>
+        </div>
+
+        {/* Bubble */}
+        <div
+          className={`rounded-3xl px-6 py-5 leading-8 ${
+            isUser
+              ? "bg-violet-600 text-white min-w-[120px] max-w-xl"
+              : "bg-[#1A1F29] text-gray-100 max-w-3xl"
+          }`}
+        >
+          {isUser ? (
+            <p className="whitespace-pre-wrap break-words">
+              {content}
+            </p>
+          ) : (
+            <Markdown content={content} />
+          )}
+        </div>
       </div>
     </div>
   );

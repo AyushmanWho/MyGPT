@@ -1,9 +1,18 @@
+import { useEffect, useRef } from "react";
 import { useChat } from "../../context/ChatContext";
 import Message from "./Message";
 import TypingIndicator from "../ui/TypingIndicator";
 
 export default function ChatArea() {
   const { messages, isThinking } = useChat();
+
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages, isThinking]);
 
   if (messages.length === 0) {
     return (
@@ -35,7 +44,10 @@ export default function ChatArea() {
             content={msg.content}
           />
         ))}
+
         {isThinking && <TypingIndicator />}
+
+        <div ref={bottomRef} />
       </div>
     </main>
   );

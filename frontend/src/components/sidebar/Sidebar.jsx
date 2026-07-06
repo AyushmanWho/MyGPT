@@ -10,6 +10,7 @@ import {
 
 import Button from "../ui/Button";
 import SectionTitle from "../ui/SectionTitle";
+import { useChat } from "../../context/ChatContext";
 
 const recentChats = [
   "AI Project",
@@ -19,6 +20,8 @@ const recentChats = [
 ];
 
 export default function Sidebar() {
+  const { newChat } = useChat();
+
   return (
     <aside className="w-72 bg-[#111827] border-r border-white/10 flex flex-col">
 
@@ -40,7 +43,10 @@ export default function Sidebar() {
 
         </div>
 
-        <Button className="mt-6 w-full flex items-center justify-center gap-2">
+        <Button
+          onClick={newChat}
+          className="mt-6 w-full flex items-center justify-center gap-2"
+        >
           <Plus size={18} />
           New Chat
         </Button>

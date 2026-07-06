@@ -23,15 +23,39 @@ export function ChatProvider({ children }) {
     try {
       const reply = await sendToAI(text);
 
-      const aiMessage = {
-        id: Date.now() + 1,
-        role: "assistant",
-        content: reply,
-      };
+      setIsThinking(false);
 
-      setMessages((prev) => [...prev, aiMessage]);
+      const aiId = Date.now() + 1;
+
+      // Create an empty AI message first
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: aiId,
+          role: "assistant",
+          content: "",
+        },
+      ]);
+
+      // Reveal one character at a time
+      for (let i = 0; i <= reply.length; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 12));
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === aiId
+              ? {
+                  ...msg,
+                  content: reply.slice(0, i),
+                }
+              : msg
+          )
+        );
+      }
     } catch (error) {
       console.error("Failed to contact AI:", error);
+
+      setIsThinking(false);
 
       setMessages((prev) => [
         ...prev,
@@ -41,9 +65,12 @@ export function ChatProvider({ children }) {
           content: "⚠️ Failed to connect to the AI backend.",
         },
       ]);
-    } finally {
-      setIsThinking(false);
     }
+  }
+
+  // NEW CHAT
+  function newChat() {
+    setMessages([]);
   }
 
   return (
@@ -52,6 +79,7 @@ export function ChatProvider({ children }) {
         messages,
         sendMessage,
         isThinking,
+        newChat,
       }}
     >
       {children}

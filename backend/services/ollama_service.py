@@ -1,15 +1,7 @@
-import ollama
+from ai.ollama_provider import OllamaProvider
+
+provider = OllamaProvider()
 
 
 def ask_ollama(prompt: str):
-    response = ollama.chat(
-        model="llama3.2:3b",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-    )
-
-    return response["message"]["content"]
+    return provider.generate(prompt)
