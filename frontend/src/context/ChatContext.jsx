@@ -5,7 +5,31 @@ const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
   const [messages, setMessages] = useState([]);
+
+  const [chats, setChats] = useState([
+  {
+    id: 1,
+    title: "New Chat",
+    messages: [],
+  },
+]);
+
+const [currentChatId, setCurrentChatId] = useState(1);
+
   const [isThinking, setIsThinking] = useState(false);
+  
+  function updateCurrentChat(updateFn) {
+    setChats((prevChats) =>
+      prevChats.map((chat) => {
+        if (chat.id !== currentChatId) return chat;
+
+        return {
+          ...chat,
+          messages: updateFn(chat.messages),
+        };
+      })
+    );
+  }
 
   async function sendMessage(text) {
     if (!text.trim()) return;
@@ -70,6 +94,16 @@ export function ChatProvider({ children }) {
 
   // NEW CHAT
   function newChat() {
+    const newId = Date.now();
+
+  const newChat = {
+    id: newId,
+    title: "New Chat",
+    messages: [],
+  };
+
+    setChats((prev) => [...prev, newChat]);
+    setCurrentChatId(newId);
     setMessages([]);
   }
 
@@ -77,6 +111,8 @@ export function ChatProvider({ children }) {
     <ChatContext.Provider
       value={{
         messages,
+        chats,
+        currentChatId,
         sendMessage,
         isThinking,
         newChat,

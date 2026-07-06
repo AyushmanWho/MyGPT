@@ -12,15 +12,9 @@ import Button from "../ui/Button";
 import SectionTitle from "../ui/SectionTitle";
 import { useChat } from "../../context/ChatContext";
 
-const recentChats = [
-  "AI Project",
-  "React UI",
-  "College Notes",
-  "Hogwarts Legacy",
-];
 
 export default function Sidebar() {
-  const { newChat } = useChat();
+  const { chats, currentChatId, newChat, } = useChat();
 
   return (
     <aside className="w-72 bg-[#111827] border-r border-white/10 flex flex-col">
@@ -60,9 +54,9 @@ export default function Sidebar() {
 
         <div className="space-y-2">
 
-          {recentChats.map((chat) => (
+          {chats.map((chat) => (
             <div
-              key={chat}
+              key={chat.id}
               className="
               flex
               items-center
@@ -76,7 +70,7 @@ export default function Sidebar() {
               "
             >
               <MessageSquare size={17} />
-              <span className="text-sm">{chat}</span>
+              <span className="text-sm">{chat.title}</span>
             </div>
           ))}
 
