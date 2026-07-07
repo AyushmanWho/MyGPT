@@ -4,8 +4,7 @@ import { sendMessage as sendToAI } from "../api/chat";
 const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
-  const [messages, setMessages] = useState([]);
-
+  
   const [chats, setChats] = useState([
   {
     id: 1,
@@ -15,9 +14,11 @@ export function ChatProvider({ children }) {
 ]);
 
 const [currentChatId, setCurrentChatId] = useState(1);
+const currentChat =
+  chats.find((chat) => chat.id === currentChatId) || chats[0];
 
   const [isThinking, setIsThinking] = useState(false);
-  
+
   function updateCurrentChat(updateFn) {
     setChats((prevChats) =>
       prevChats.map((chat) => {
@@ -40,7 +41,30 @@ const [currentChatId, setCurrentChatId] = useState(1);
       content: text,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    if (
+  currentChat.title === "New Chat" &&
+  text.trim().length > 0
+) {
+  setChats((prev) =>
+    prev.map((chat) =>
+      chat.id === currentChatId
+        ? {
+            ...chat,
+            title:
+              text.length > 30
+                ? text.slice(0, 30) + "..."
+                : text,
+          }
+        : chat
+    )
+  );
+}
+
+    updateCurrentChat((messages) => [
+  ...messages,
+  userMessage,
+]);
+    
 
     setIsThinking(true);
 
@@ -52,43 +76,43 @@ const [currentChatId, setCurrentChatId] = useState(1);
       const aiId = Date.now() + 1;
 
       // Create an empty AI message first
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: aiId,
-          role: "assistant",
-          content: "",
-        },
-      ]);
+      updateCurrentChat((messages) => [
+  ...messages,
+  {
+    id: aiId,
+    role: "assistant",
+    content: "",
+  },
+]);
 
       // Reveal one character at a time
       for (let i = 0; i <= reply.length; i++) {
         await new Promise((resolve) => setTimeout(resolve, 12));
 
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === aiId
-              ? {
-                  ...msg,
-                  content: reply.slice(0, i),
-                }
-              : msg
-          )
-        );
+        updateCurrentChat((messages) =>
+  messages.map((msg) =>
+    msg.id === aiId
+      ? {
+          ...msg,
+          content: reply.slice(0, i),
+        }
+      : msg
+  )
+);
       }
     } catch (error) {
       console.error("Failed to contact AI:", error);
 
       setIsThinking(false);
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          role: "assistant",
-          content: "⚠️ Failed to connect to the AI backend.",
-        },
-      ]);
+      updateCurrentChat((messages) => [
+  ...messages,
+  {
+    id: Date.now() + 1,
+    role: "assistant",
+    content: "⚠️ Failed to connect to the AI backend.",
+  },
+]);
     }
   }
 
@@ -102,21 +126,42 @@ const [currentChatId, setCurrentChatId] = useState(1);
     messages: [],
   };
 
-    setChats((prev) => [...prev, newChat]);
+    setChats((prev) => [newChat, ...prev ]);
     setCurrentChatId(newId);
-    setMessages([]);
+    
   }
+
+  function switchChat(chatId) {
+  setCurrentChatId(chatId);
+}
+
+function deleteChat(chatId) {
+  if (chats.length === 1) return;
+
+  const updatedChats = chats.filter(
+    (chat) => chat.id !== chatId
+  );
+
+  setChats(updatedChats);
+
+  if (currentChatId === chatId) {
+    setCurrentChatId(updatedChats[0].id);
+  }
+}
 
   return (
     <ChatContext.Provider
       value={{
-        messages,
-        chats,
-        currentChatId,
-        sendMessage,
-        isThinking,
-        newChat,
-      }}
+  currentChat,
+  messages: currentChat.messages,
+  chats,
+  currentChatId,
+  sendMessage,
+  isThinking,
+  newChat,
+  switchChat,
+  deleteChat,
+}}
     >
       {children}
     </ChatContext.Provider>
@@ -126,3 +171,5 @@ const [currentChatId, setCurrentChatId] = useState(1);
 export function useChat() {
   return useContext(ChatContext);
 }
+
+

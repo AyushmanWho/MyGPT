@@ -4,7 +4,9 @@ import Message from "./Message";
 import TypingIndicator from "../ui/TypingIndicator";
 
 export default function ChatArea() {
-  const { messages, isThinking } = useChat();
+  const { currentChat, isThinking } = useChat();
+
+  const messages = currentChat?.messages || [];
 
   const bottomRef = useRef(null);
 

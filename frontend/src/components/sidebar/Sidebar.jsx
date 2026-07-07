@@ -6,6 +6,7 @@ import {
   FileText,
   Settings,
   UserCircle2,
+  Trash2,
 } from "lucide-react";
 
 import Button from "../ui/Button";
@@ -14,7 +15,13 @@ import { useChat } from "../../context/ChatContext";
 
 
 export default function Sidebar() {
-  const { chats, currentChatId, newChat, } = useChat();
+  const {
+  chats,
+  currentChatId,
+  newChat,
+  switchChat,
+  deleteChat,
+} = useChat();
 
   return (
     <aside className="w-72 bg-[#111827] border-r border-white/10 flex flex-col">
@@ -55,24 +62,45 @@ export default function Sidebar() {
         <div className="space-y-2">
 
           {chats.map((chat) => (
-            <div
-              key={chat.id}
-              className="
-              flex
-              items-center
-              gap-3
-              px-3
-              py-3
-              rounded-xl
-              hover:bg-[#1A2232]
-              cursor-pointer
-              transition
-              "
-            >
-              <MessageSquare size={17} />
-              <span className="text-sm">{chat.title}</span>
-            </div>
-          ))}
+  <div
+    key={chat.id}
+    onClick={() => switchChat(chat.id)}
+    className={`
+      group
+      flex
+      items-center
+      gap-3
+      px-3
+      py-3
+      rounded-xl
+      cursor-pointer
+      transition
+      ${
+        currentChatId === chat.id
+          ? "bg-violet-600/20 border border-violet-500"
+          : "hover:bg-[#1A2232]"
+      }
+    `}
+  >
+    <MessageSquare size={17} />
+
+    <span className="text-sm flex-1 truncate">
+      {chat.title}
+    </span>
+
+    {chats.length > 1 && (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteChat(chat.id);
+        }}
+        className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-400 transition"
+      >
+        <Trash2 size={15} />
+      </button>
+    )}
+  </div>
+))}
 
         </div>
 
