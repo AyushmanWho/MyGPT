@@ -4,9 +4,14 @@ import Message from "./Message";
 import TypingIndicator from "../ui/TypingIndicator";
 
 export default function ChatArea() {
-  const { currentChat, isThinking } = useChat();
+  const {
+  messages,
+  isThinking,
+  highlightedMessageId,
+  setHighlightedMessageId,
+} = useChat();
 
-  const messages = currentChat?.messages || [];
+  
 
   const bottomRef = useRef(null);
 
@@ -15,6 +20,25 @@ export default function ChatArea() {
       behavior: "smooth",
     });
   }, [messages, isThinking]);
+
+  useEffect(() => {
+  if (!highlightedMessageId) return;
+
+  const element = document.getElementById(
+    `message-${highlightedMessageId}`
+  );
+
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    setTimeout(() => {
+      setHighlightedMessageId(null);
+    }, 2000);
+  }
+}, [highlightedMessageId]);
 
   if (messages.length === 0) {
     return (
@@ -41,11 +65,13 @@ export default function ChatArea() {
       <div className="max-w-4xl mx-auto">
         {messages.map((msg) => (
           <Message
-            key={msg.id}
-            role={msg.role}
-            content={msg.content}
-          />
-        ))}
+              key={msg.id}
+              id={msg.id}
+              role={msg.role}
+              content={msg.content}
+              highlighted={msg.id === highlightedMessageId}
+            />
+                    ))}
 
         {isThinking && <TypingIndicator />}
 

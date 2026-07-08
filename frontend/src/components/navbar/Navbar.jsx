@@ -1,3 +1,5 @@
+import SearchDropdown from "./SearchDropdown";
+import { useChat } from "../../context/ChatContext";
 import {
   Search,
   Bell,
@@ -6,6 +8,37 @@ import {
 } from "lucide-react";
 
 export default function Navbar() {
+  const {
+  searchQuery,
+  setSearchQuery,
+  chats,
+} = useChat();
+
+  const results = chats.reduce((acc, chat) => {
+    const query = searchQuery.toLowerCase();
+
+    // Title match
+   const titleMatch = chat.title
+  .toLowerCase()
+  .includes(query);
+
+const matchedMessages = chat.messages.filter((message) =>
+  message.content.toLowerCase().includes(query)
+);
+
+if (titleMatch || matchedMessages.length > 0) {
+ acc.push({
+  chat,
+  titleMatch,
+  matchedMessages,
+});
+}
+      
+    
+
+    
+  return acc;
+}, []);
   return (
     <header className="h-16 border-b border-white/10 bg-[#0F1115]/80 backdrop-blur-xl flex items-center justify-between px-8">
 
@@ -20,21 +53,29 @@ export default function Navbar() {
           />
 
           <input
-            placeholder="Search chats..."
-            className="
-            w-96
-            bg-[#1A1F29]
-            border
-            border-white/10
-            rounded-xl
-            py-2.5
-            pl-10
-            pr-4
-            text-sm
-            outline-none
-            focus:border-violet-500
-            "
-          />
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  placeholder="Search chats..."
+  className="
+    w-96
+    bg-[#1A1F29]
+    border
+    border-white/10
+    rounded-xl
+    py-2.5
+    pl-10
+    pr-4
+    text-sm
+    outline-none
+    focus:border-violet-500
+  "
+/>
+{searchQuery.trim() && (
+  <SearchDropdown
+  results={results}
+  searchQuery={searchQuery}
+/>
+)}
 
         </div>
 

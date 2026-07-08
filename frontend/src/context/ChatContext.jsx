@@ -1,23 +1,48 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { sendMessage as sendToAI } from "../api/chat";
 
 const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
   
-  const [chats, setChats] = useState([
-  {
-    id: 1,
-    title: "New Chat",
-    messages: [],
-  },
-]);
+  const [chats, setChats] = useState(() => {
+  const savedChats = localStorage.getItem("mygpt-chats");
 
-const [currentChatId, setCurrentChatId] = useState(1);
+  if (savedChats) {
+    return JSON.parse(savedChats);
+  }
+
+  return [
+    {
+      id: 1,
+      title: "New Chat",
+      messages: [],
+    },
+  ];
+});
+
+const [currentChatId, setCurrentChatId] = useState(() => {
+  return Number(localStorage.getItem("mygpt-current-chat")) || 1;
+});
 const currentChat =
   chats.find((chat) => chat.id === currentChatId) || chats[0];
 
   const [isThinking, setIsThinking] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [highlightedMessageId, setHighlightedMessageId] = useState(null);
+  useEffect(() => {
+  localStorage.setItem(
+    "mygpt-chats",
+    JSON.stringify(chats)
+  );
+}, [chats]);
+
+useEffect(() => {
+  localStorage.setItem(
+    "mygpt-current-chat",
+    currentChatId
+  );
+}, [currentChatId]);
 
   function updateCurrentChat(updateFn) {
     setChats((prevChats) =>
@@ -161,6 +186,10 @@ function deleteChat(chatId) {
   newChat,
   switchChat,
   deleteChat,
+  searchQuery,
+  setSearchQuery,
+  highlightedMessageId,
+setHighlightedMessageId,
 }}
     >
       {children}

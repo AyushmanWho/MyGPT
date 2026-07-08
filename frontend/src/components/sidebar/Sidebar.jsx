@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Plus,
   MessageSquare,
@@ -21,7 +22,11 @@ export default function Sidebar() {
   newChat,
   switchChat,
   deleteChat,
+  searchQuery,
 } = useChat();
+
+const [search, setSearch] = useState("");
+
 
   return (
     <aside className="w-72 bg-[#111827] border-r border-white/10 flex flex-col">

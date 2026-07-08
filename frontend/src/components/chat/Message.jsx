@@ -1,15 +1,21 @@
 import Markdown from "../ui/Markdown";
 import Avatar from "../ui/Avatar";
 
-export default function Message({ role, content }) {
+export default function Message({
+  id,
+  role,
+  content,
+  highlighted,
+}) {
   const isUser = role === "user";
 
   return (
     <div
-      className={`flex items-start gap-4 mb-8 ${
-        isUser ? "flex-row-reverse" : ""
-      }`}
-    >
+  id={`message-${id}`}
+  className={`flex items-start gap-4 mb-8 ${
+    isUser ? "flex-row-reverse" : ""
+  }`}
+>
       {/* Avatar */}
       <Avatar role={role} />
 
@@ -28,12 +34,25 @@ export default function Message({ role, content }) {
 
         {/* Bubble */}
         <div
-          className={`rounded-3xl px-6 py-5 leading-8 ${
-            isUser
-              ? "bg-violet-600 text-white min-w-[120px] max-w-xl"
-              : "bg-[#1A1F29] text-gray-100 max-w-3xl"
-          }`}
-        >
+  className={`
+    rounded-3xl
+    px-6
+    py-5
+    leading-8
+    transition-all
+    duration-700
+    ${
+      isUser
+        ? "bg-violet-600 text-white min-w-[120px] max-w-xl"
+        : "bg-[#1A1F29] text-gray-100 max-w-3xl"
+    }
+    ${
+      highlighted
+        ? "ring-2 ring-violet-400 bg-violet-900/30"
+        : ""
+    }
+  `}
+>
           {isUser ? (
             <p className="whitespace-pre-wrap break-words">
               {content}

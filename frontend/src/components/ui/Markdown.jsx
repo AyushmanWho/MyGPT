@@ -2,14 +2,22 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { FiCopy } from "react-icons/fi";
+import { FiCopy, FiCheck } from "react-icons/fi";
+import { useState } from "react";
 
 function CodeBlock({ children, language }) {
   const code = String(children).replace(/\n$/, "");
+  const [copied, setCopied] = useState(false);
 
-  const copyCode = () => {
-    navigator.clipboard.writeText(code);
-  };
+  const copyCode = async () => {
+  await navigator.clipboard.writeText(code);
+
+  setCopied(true);
+
+  setTimeout(() => {
+    setCopied(false);
+  }, 2000);
+};
 
   return (
     <div className="relative my-4 rounded-xl overflow-hidden border border-[#2B313C]">
@@ -17,11 +25,27 @@ function CodeBlock({ children, language }) {
         <span>{language || "text"}</span>
 
         <button
-          onClick={copyCode}
-          className="hover:text-violet-400 transition"
-        >
-          <FiCopy />
-        </button>
+  onClick={copyCode}
+  className="
+    flex
+    items-center
+    gap-2
+    hover:text-violet-400
+    transition
+  "
+>
+  {copied ? (
+    <>
+      <FiCheck />
+      <span>Copied!</span>
+    </>
+  ) : (
+    <>
+      <FiCopy />
+      <span>Copy</span>
+    </>
+  )}
+</button>
       </div>
 
       <SyntaxHighlighter
