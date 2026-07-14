@@ -1,3 +1,4 @@
+import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import {
   Plus,
@@ -25,6 +26,7 @@ export default function Sidebar() {
   searchQuery,
 } = useChat();
 
+const { user, logout } = useAuth();
 const [search, setSearch] = useState("");
 
 
@@ -139,23 +141,40 @@ const [search, setSearch] = useState("");
       <div className="border-t border-white/10 p-5">
 
         <div className="flex items-center gap-3">
+<div className="flex items-center gap-3">
 
-          <UserCircle2
-            size={42}
-            className="text-violet-400"
-          />
+  <img
+    src={user.photoURL}
+    alt={user.displayName}
+    className="w-11 h-11 rounded-full"
+  />
 
-          <div>
-            <p className="font-medium">
-              Ayushman
-            </p>
+  <div className="flex-1 overflow-hidden">
+    <p className="font-medium truncate">
+      {user.displayName}
+    </p>
 
-            <p className="text-xs text-gray-400">
-              Free Plan
-            </p>
+    <p className="text-xs text-gray-400 truncate">
+      {user.email}
+    </p>
+  </div>
 
-          </div>
+</div>
 
+<button
+  onClick={logout}
+  className="
+    mt-4
+    w-full
+    py-2
+    rounded-xl
+    bg-red-500/10
+    hover:bg-red-500/20
+    transition
+  "
+>
+  Logout
+</button>
         </div>
 
       </div>

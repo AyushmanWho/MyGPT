@@ -5,6 +5,8 @@ import {
   serverTimestamp,
   query,
   orderBy,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 
 import { db } from "../firebase";
@@ -35,4 +37,23 @@ export async function loadChats(uid) {
     id: doc.id,
     ...doc.data(),
   }));
+}
+
+export async function saveMessages(
+  uid,
+  chatId,
+  messages
+) {
+  const chatRef = doc(
+    db,
+    "users",
+    uid,
+    "chats",
+    chatId
+  );
+
+  await updateDoc(chatRef, {
+    messages,
+    updatedAt: serverTimestamp(),
+  });
 }
