@@ -1,25 +1,17 @@
+import {
+  loadChats,
+  saveChats,
+  loadCurrentChat,
+  saveCurrentChat,
+} from "../utils/chatStorage";
 import { createContext, useContext, useState, useEffect } from "react";
-import { sendMessage as sendToAI } from "../api/chat";
+import { getAIResponse } from "../services/aiService";
 
 const ChatContext = createContext();
 
 export function ChatProvider({ children }) {
   
-  const [chats, setChats] = useState(() => {
-  const savedChats = localStorage.getItem("mygpt-chats");
-
-  if (savedChats) {
-    return JSON.parse(savedChats);
-  }
-
-  return [
-    {
-      id: 1,
-      title: "New Chat",
-      messages: [],
-    },
-  ];
-});
+ const [chats, setChats] = useState(loadChats);
 
 const [currentChatId, setCurrentChatId] = useState(() => {
   return Number(localStorage.getItem("mygpt-current-chat")) || 1;
@@ -94,7 +86,7 @@ useEffect(() => {
     setIsThinking(true);
 
     try {
-      const reply = await sendToAI(text);
+      const reply = await getAIResponse(text);
 
       setIsThinking(false);
 
